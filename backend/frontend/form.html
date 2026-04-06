@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>อวยพรคู่บ่าวสาว</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Sarabun:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #f7f0e6;
+      --gold:    #b8892a;
+      --rose:    #c9897a;
+      --ink:     #2e1f0e;
+      --ink-dim: rgba(46,31,14,0.45);
+      --card-bg: #fffdf8;
+      --border:  rgba(184,137,42,0.28);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 70% at 50% 30%, #fff8ee 0%, var(--bg) 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 36px 20px;
+      font-family: 'Sarabun', sans-serif;
+      color: var(--ink);
+    }
+
+    /* ── CARD ── */
+    .card {
+      width: 100%; max-width: 460px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 40px rgba(46,31,14,0.10);
+      padding: 44px 38px 40px;
+      position: relative;
+    }
+
+    .card::before, .card::after {
+      content: ''; position: absolute;
+      width: 18px; height: 18px;
+      border-color: var(--gold); border-style: solid; opacity: 0.5;
+    }
+    .card::before { top:-1px; left:-1px;   border-width: 2px 0 0 2px; }
+    .card::after  { bottom:-1px; right:-1px; border-width: 0 2px 2px 0; }
+
+    /* ── HEADER ── */
+    .hd { text-align: center; margin-bottom: 28px; }
+    .hd .ring { font-size: 32px; margin-bottom: 12px; }
+    .hd h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 600; color: var(--ink);
+    }
+    .hd p {
+      font-size: 10px; letter-spacing: 0.45em; text-transform: uppercase;
+      color: var(--gold); margin-top: 5px;
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 20px 0; opacity: 0.35;
+    }
+    .dl { flex:1; height:1px; background: var(--gold); }
+    .dd { width:5px; height:5px; background: var(--rose); transform: rotate(45deg); flex-shrink:0; }
+
+    /* ── FIELD ── */
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 10px; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 7px;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #fdf8f2;
+      border: 1px solid rgba(184,137,42,0.22);
+      color: var(--ink);
+      font-family: 'Sarabun', sans-serif; font-size: 15px;
+      padding: 11px 14px; outline: none; resize: none;
+      transition: border-color 0.25s, background 0.25s;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--ink-dim); font-style: italic;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--rose);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(201,137,122,0.10);
+    }
+
+    .cc {
+      text-align: right; font-size: 11px;
+      color: var(--ink-dim); margin-top: 4px;
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: var(--rose);
+      border: none;
+      color: #fff;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+      margin-top: 6px;
+      box-shadow: 0 2px 12px rgba(201,137,122,0.28);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #b97668;
+      transform: translateY(-1px);
+    }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── FEEDBACK ── */
+    #feedback { margin-top: 12px; text-align: center; font-size: 13px; min-height: 18px; }
+    #feedback.error   { color: #b05050; }
+    #feedback.success { color: #6a9e6a; }
+
+    /* ── THANK YOU ── */
+    #ty { display: none; text-align: center; padding: 8px 0; }
+    #ty.show { display: block; }
+
+    .ty-icon {
+      font-size: 44px; margin-bottom: 16px;
+      animation: popIn 0.55s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+
+    #ty h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 600;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    #ty .sub {
+      font-size: 13px; color: var(--ink-dim);
+      letter-spacing: 0.05em; margin-bottom: 30px;
+    }
+
+    /* action buttons */
+    .ty-actions { display: flex; flex-direction: column; gap: 12px; }
+
+    .btn-wall {
+      display: block; width: 100%; padding: 14px;
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; text-align: center;
+      box-shadow: 0 2px 12px rgba(184,137,42,0.22);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-wall:hover { background: #a07824; transform: translateY(-1px); }
+
+    .btn-again {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--ink-dim);
+      padding: 12px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-again:hover { border-color: var(--rose); color: var(--rose); }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <div class="hd" id="hd">
+    <div class="ring">💍</div>
+    <h1>ส่งคำอวยพร</h1>
+    <p>Wedding Wish Wall</p>
+  </div>
+  <div class="divider" id="hdiv">
+    <div class="dl"></div><div class="dd"></div><div class="dl"></div>
+  </div>
+
+  <!-- FORM -->
+  <div id="form-section">
+    <div class="field">
+      <label>ชื่อของคุณ</label>
+      <input type="text" id="guestName" placeholder="กรุณาใส่ชื่อของคุณ" maxlength="80" />
+      <div class="cc"><span id="nc">0</span>/80</div>
+    </div>
+
+    <div class="field">
+      <label>คำอวยพร</label>
+      <textarea id="message" placeholder="เขียนคำอวยพรให้คู่บ่าวสาว..." rows="5" maxlength="500"></textarea>
+      <div class="cc"><span id="mc">0</span>/500</div>
+    </div>
+
+    <button class="btn-primary" id="submit-btn" onclick="submitWish()">
+      ส่งคำอวยพร
+    </button>
+    <div id="feedback"></div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div id="ty">
+    <div class="ty-icon">🌸</div>
+    <h2>ขอบคุณมาก!</h2>
+    <p class="sub">คำอวยพรของคุณปรากฏบนหน้าจอแล้ว</p>
+
+    <div class="ty-actions">
+      <a class="btn-wall" href="/display.html" target="_blank">
+        ดูคำอวยพรทั้งหมด
+      </a>
+      <button class="btn-again" onclick="resetForm()">ส่งคำอวยพรอีกครั้ง</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const BACKEND_URL = '';
+
+  document.getElementById('guestName').addEventListener('input', function() {
+    document.getElementById('nc').textContent = this.value.length;
+  });
+  document.getElementById('message').addEventListener('input', function() {
+    document.getElementById('mc').textContent = this.value.length;
+  });
+
+  async function submitWish() {
+    const guestName = document.getElementById('guestName').value.trim();
+    const message   = document.getElementById('message').value.trim();
+    const btn       = document.getElementById('submit-btn');
+
+    if (!guestName) { setFeedback('กรุณาใส่ชื่อของคุณ','error'); return; }
+    if (!message)   { setFeedback('กรุณาเขียนคำอวยพร','error'); return; }
+
+    btn.disabled = true; btn.textContent = 'กำลังส่ง...';
+    clearFeedback();
+
+    try {
+      const res  = await fetch(`${BACKEND_URL}/api/wishes`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ guestName, message }),
+      });
+      const json = await res.json();
+
+      if (res.ok && json.success) {
+        document.getElementById('hd').style.display   = 'none';
+        document.getElementById('hdiv').style.display  = 'none';
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('ty').classList.add('show');
+      } else {
+        setFeedback(json.message || 'เกิดข้อผิดพลาด', 'error');
+        btn.disabled = false; btn.textContent = 'ส่งคำอวยพร';
+      }
+    } catch(e) {
+      setFeedback('ไม่สามารถเชื่อมต่อ server ได้', 'error');
+      btn.disabled = false; btn.textContent = 'ส่งคำอวยพร';
+    }
+  }
+
+  function resetForm() {
+    ['guestName','message'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('nc').textContent = '0';
+    document.getElementById('mc').textContent = '0';
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = false; btn.textContent = 'ส่งคำอวยพร';
+    clearFeedback();
+    document.getElementById('hd').style.display   = '';
+    document.getElementById('hdiv').style.display  = '';
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('ty').classList.remove('show');
+  }
+
+  function setFeedback(msg, type) {
+    const el = document.getElementById('feedback');
+    el.textContent = msg; el.className = type;
+  }
+  function clearFeedback() {
+    const el = document.getElementById('feedback');
+    el.textContent = ''; el.className = '';
+  }
+</script>
+</body>
+</html>

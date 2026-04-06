@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedding Wish Wall</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Sarabun:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #f7f0e6;
+      --gold:        #b8892a;
+      --rose:        #c9897a;
+      --ink:         #2e1f0e;
+      --ink-dim:     rgba(46,31,14,0.42);
+      --card-bg:     #fffdf8;
+      --card-border: rgba(184,137,42,0.28);
+      --shadow:      rgba(46,31,14,0.10);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      background: var(--bg);
+      background-image:
+        repeating-linear-gradient(
+          0deg, transparent, transparent 28px,
+          rgba(184,137,42,0.025) 28px, rgba(184,137,42,0.025) 29px
+        ),
+        radial-gradient(ellipse 80% 70% at 50% 40%, #fff8ee 0%, var(--bg) 100%);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Sarabun', sans-serif;
+      color: var(--ink);
+    }
+
+    /* ══════════════════════════════
+       HEADER
+    ══════════════════════════════ */
+    header {
+      flex-shrink: 0;
+      text-align: center;
+      padding: 20px 40px 12px;
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 16px 8px;
+      }
+    }
+    .hd-top {
+      display: flex; align-items: center;
+      justify-content: center; gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .hd-top {
+        gap: 12px;
+      }
+    }
+    .hd-line {
+      flex: 1; max-width: 160px;
+      height: 1px; background: var(--gold); opacity: 0.35;
+    }
+    @media (max-width: 768px) {
+      .hd-line {
+        max-width: 80px;
+      }
+    }
+    .hd-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; font-weight: 400;
+      letter-spacing: 0.6em; text-transform: uppercase;
+      color: var(--gold);
+    }
+    @media (max-width: 768px) {
+      .hd-title {
+        font-size: 11px;
+      }
+    }
+    .hd-diamond {
+      width: 6px; height: 6px; background: var(--rose);
+      transform: rotate(45deg); margin: 7px auto 0; opacity: 0.55;
+    }
+
+    /* ══════════════════════════════
+       STAGE
+    ══════════════════════════════ */
+    #stage {
+      flex: 1;
+      padding: 8px 24px 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+    }
+    @media (max-width: 768px) {
+      #stage {
+        padding: 6px 12px 4px;
+      }
+    }
+
+    /* ══════════════════════════════
+       GRID — layout เปลี่ยนตาม JS
+    ══════════════════════════════ */
+    #flow {
+      display: grid;
+      gap: 12px;
+      width: 100%;
+      height: 100%;
+      padding: 12px;
+      /* grid-template-columns และ rows กำหนดจาก JS */
+    }
+    @media (max-width: 768px) {
+      #flow {
+        gap: 8px;
+        padding: 8px;
+      }
+    }
+
+    /* ══════════════════════════════
+       WISH CARD
+    ══════════════════════════════ */
+    .wish-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 2px 16px var(--shadow);
+      border-radius: 2px;
+      padding: 0 28px;          /* padding แนวนอน; แนวตั้งใช้ flex justify */
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.9) translateY(8px);
+      animation: cardIn 0.55s cubic-bezier(0.34,1.4,0.64,1) forwards;
+    }
+
+    @keyframes cardIn {
+      to { opacity:1; transform:scale(1) translateY(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity:0; transform:translateX(50px) scale(0.96); }
+      to   { opacity:1; transform:translateX(0)    scale(1);    }
+    }
+    @keyframes slideOutLeft {
+      from { opacity:1; transform:translateX(0);     }
+      to   { opacity:0; transform:translateX(-50px); }
+    }
+
+    .wish-card.entering {
+      animation: slideInRight 0.5s cubic-bezier(0.34,1.2,0.64,1) forwards;
+    }
+    .wish-card.leaving {
+      animation: slideOutLeft 0.3s ease-in forwards;
+      pointer-events: none;
+    }
+
+    /* มุม card */
+    .wish-card::before, .wish-card::after {
+      content:''; position:absolute;
+      width:12px; height:12px;
+      border-color:var(--gold); border-style:solid; opacity:0.4;
+    }
+    .wish-card::before { top:6px;    left:6px;  border-width:1px 0 0 1px; }
+    .wish-card::after  { bottom:6px; right:6px; border-width:0 1px 1px 0; }
+
+    /* card ใหม่ล่าสุด */
+    .wish-card.newest {
+      border-left: 2px solid var(--rose);
+      animation: slideInRight 0.5s cubic-bezier(0.34,1.2,0.64,1) forwards,
+                 rosePulse 2s ease 0.4s;
+    }
+    @keyframes rosePulse {
+      0%  { box-shadow: 0 2px 16px var(--shadow), 0 0 0 0    rgba(201,137,122,0.4); }
+      55% { box-shadow: 0 2px 16px var(--shadow), 0 0 0 18px rgba(201,137,122,0);   }
+      100%{ box-shadow: 0 2px 16px var(--shadow), 0 0 0 0    rgba(201,137,122,0);   }
+    }
+
+    /* เนื้อหาใน card */
+    .card-deco {
+      color: var(--rose); opacity: 0.5;
+      line-height: 1; flex-shrink: 0;
+      /* ขนาดกำหนดจาก JS inline style */
+    }
+    .card-msg {
+      font-family: 'Sarabun', sans-serif;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.6;
+      letter-spacing: 0.3px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      /* Auto-shrink: ลดฟอนต์อัตโนมัติเมื่อข้อความยาว */
+      transition: max-height 0.3s ease;
+    }
+    .card-msg.collapsed {
+      max-height: 150px;
+      overflow: hidden;
+      position: relative;
+    }
+    .card-msg.collapsed::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(transparent, var(--card-bg));
+    }
+    .read-more-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      padding: 0;
+      font-family: 'Sarabun', sans-serif;
+      transition: opacity 0.2s ease;
+    }
+    .read-more-btn:hover {
+      opacity: 0.7;
+    }
+    @media (max-width: 768px) {
+      .read-more-btn {
+        font-size: 11px;
+        margin-top: 6px;
+      }
+      .read-more-btn.show {
+        display: block;
+      }
+    }
+    .card-name {
+      font-family: 'Sarabun', sans-serif;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════ */
+    #empty {
+      grid-column: 1 / -1; grid-row: 1 / -1;
+      display: none;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--ink-dim);
+      gap: 14px;
+    }
+    #empty .ring {
+      font-size: 52px;
+      animation: float 3s ease-in-out infinite;
+    }
+    #empty p {
+      font-size: 11px; letter-spacing: 0.45em; text-transform: uppercase;
+    }
+    @keyframes float {
+      0%,100%{ transform:translateY(0); }
+      50%    { transform:translateY(-8px); }
+    }
+
+    #ticker-wrap {
+      flex-shrink: 0;
+      border-top: 1px solid var(--card-border);
+      background: linear-gradient(90deg, var(--bg) 0%, #ede3d3 50%, var(--bg) 100%);
+      padding: 9px 0;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg,transparent 0%,#000 5%,#000 95%,transparent 100%);
+              mask-image: linear-gradient(90deg,transparent 0%,#000 5%,#000 95%,transparent 100%);
+    }
+    @media (max-width: 768px) {
+      #ticker-wrap {
+        padding: 6px 0;
+      }
+    }
+    #ticker-track {
+      display: flex;
+      width: max-content;
+      animation: tickerScroll 40s linear infinite;
+      gap: 20px;
+      font-size: 12px;
+    }
+    @media (max-width: 768px) {
+      #ticker-track {
+        gap: 12px;
+        font-size: 11px;
+      }
+    }
+    #ticker-track:hover { animation-play-state: paused; }
+    @keyframes tickerScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 36px;
+      white-space: nowrap;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink);
+    }
+    @media (max-width: 768px) {
+      .ticker-item {
+        padding: 0 20px;
+        font-size: 13px;
+      }
+    }
+    .t-sep  { color:var(--rose);  font-style:normal; font-size:10px; opacity:0.55; }
+    .t-name { color:var(--gold);  font-style:normal; font-size:10px;
+              letter-spacing:0.28em; text-transform:uppercase; }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    footer {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 32px 10px;
+      font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--ink-dim);
+      border-top: 1px solid var(--card-border);
+      background: linear-gradient(90deg, transparent 0%, rgba(184,137,42,0.02) 50%, transparent 100%);
+    }
+    @media (max-width: 768px) {
+      footer {
+        gap: 8px;
+        padding: 4px 12px 6px;
+        font-size: 7px;
+      }
+    }
+    footer span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #wish-count {
+      justify-content: flex-start;
+    }
+    #date-time {
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+    }
+    @media (max-width: 768px) {
+      #date-time {
+        font-size: 8px;
+      }
+    }
+    .live-section {
+      justify-content: flex-end;
+    }
+    .live-dot {
+      width:5px; height:5px; border-radius:50%;
+      background:#7ab87a; display:inline-block; margin-right:5px;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @media (max-width: 768px) {
+      .live-dot {
+        width: 4px;
+        height: 4px;
+        margin-right: 3px;
+      }
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="hd-top">
+      <div class="hd-line"></div>
+      <div class="hd-title">Wedding Wish Wall</div>
+      <div class="hd-line"></div>
+    </div>
+    <div class="hd-diamond"></div>
+  </header>
+
+  <div id="stage">
+    <div id="flow">
+      <div id="empty">
+        <p>รอรับคำอวยพร...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="ticker-wrap" style="display:none;">
+    <div id="ticker-track"></div>
+  </div>
+
+  <footer>
+    <span id="wish-count"></span>
+    <span id="date-time"></span>
+    <span class="live-section"><span class="live-dot"></span>Live</span>
+  </footer>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const BACKEND_URL  = '';
+    const MAX_GRID     = 9;
+    const TICKER_SPEED = 38;
+
+    let wishes = [];
+
+    function esc(s) {
+      return s
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;');
+    }
+
+    /* ══════════════════════════════
+       Grid layout config ตามจำนวน card
+       cols × rows, font sizes, spacing
+    ══════════════════════════════ */
+    function getLayout(n) {
+      // n = จำนวน card ที่จะแสดง
+      const isMobile = window.innerWidth <= 768;
+      
+      // Mobile: ทุกอันแสดง 1 column
+      if (isMobile) {
+        return {
+          cols: 1, rows: n,
+          msg: 16, name: 10, deco: 9,
+          decoMb: 6, nameMt: 8,
+          px: 20
+        };
+      }
+      
+      // Desktop layouts
+      if (n === 1) return {
+        cols: 1, rows: 1,
+        msg: 20, name: 11, deco: 11,
+        decoMb: 8, nameMt: 10,
+        px: 32
+      };
+      if (n === 2) return {
+        cols: 2, rows: 1,
+        msg: 30, name: 13, deco: 14,
+        decoMb: 10, nameMt: 12, px: 36
+      };
+      if (n === 3) return {
+        cols: 3, rows: 1,
+        msg: 24, name: 12, deco: 12,
+        decoMb: 8, nameMt: 10, px: 28
+      };
+      if (n === 4) return {
+        cols: 2, rows: 2,
+        msg: 26, name: 13, deco: 13,
+        decoMb: 10, nameMt: 12, px: 32
+      };
+      if (n === 5) return {
+  cols: 2,
+  rows: 3,
+  msg: 22,
+  name: 11,
+  deco: 11,
+  decoMb: 8,
+  nameMt: 10,
+  px: 26
+};
+      if (n <= 6) return {
+        cols: 3, rows: 2,
+        msg: 20, name: 11, deco: 11,
+        decoMb: 7, nameMt: 9, px: 22
+      };
+      // 7-9
+      return {
+        cols: 3, rows: 3,
+        msg: 16, name: 10, deco: 10,
+        decoMb: 6, nameMt: 8, px: 18
+      };
+    }
+
+    /* ══════════════════════════════
+       TICKER
+    ══════════════════════════════ */
+    function buildTicker() {
+      const wrap  = document.getElementById('ticker-wrap');
+      const track = document.getElementById('ticker-track');
+      if (!wishes.length) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+
+      const html = wishes.map(w => `
+        <span class="ticker-item">
+          <span class="t-sep">✦</span>
+          ${esc(w.message)}
+          <span class="t-name">— ${esc(w.guestName)}</span>
+        </span>`).join('');
+
+      track.innerHTML = html + html;   // 2 รอบ เพื่อ loop ราบรื่น
+
+      const dur = Math.max(18, TICKER_SPEED + wishes.length * 0.7);
+      track.style.animationDuration = `${dur}s`;
+    }
+
+    /* ══════════════════════════════
+       RENDER GRID
+    ══════════════════════════════ */
+    function render(newArrived = false) {
+      const flow  = document.getElementById('flow');
+      const empty = document.getElementById('empty');
+      const wc    = document.getElementById('wish-count');
+
+      wc.textContent = wishes.length ? `${wishes.length} คำอวยพร` : '';
+      buildTicker();
+
+      if (!wishes.length) {
+        flow.querySelectorAll('.wish-card').forEach(e => e.remove());
+        empty.style.display = 'flex';
+        return;
+      }
+      empty.style.display = 'none';
+
+      const show = wishes.slice(-MAX_GRID);
+      const n    = show.length;
+      const L    = getLayout(n);
+
+      // อัปเดต grid template
+      flow.style.gridTemplateColumns = `repeat(${L.cols}, 1fr)`;
+      flow.style.gridTemplateRows    = `repeat(${L.rows}, 1fr)`;
+      
+      // ชื่อสำหรับเบสสาหรับเบส
+
+      /* ── card ใหม่เข้า + grid เต็ม → animate ออก-เข้า ── */
+      if (newArrived && flow.querySelectorAll('.wish-card').length >= MAX_GRID) {
+        const first = flow.querySelector('.wish-card');
+        if (first) {
+          first.classList.add('leaving');
+          first.addEventListener('animationend', () => {
+            first.remove();
+            appendCard(flow, show[show.length - 1], L, true);
+          }, { once: true });
+        }
+        return;
+      }
+
+      /* ── วาดใหม่ทั้งหมด ── */
+      flow.querySelectorAll('.wish-card').forEach(e => e.remove());
+      show.forEach((w, i) => {
+        const isNewest = newArrived && i === n - 1;
+        appendCard(flow, w, L, isNewest, i * 0.05);
+      });
+    }
+
+    /* ── สร้าง card 1 ใบ ── */
+    function appendCard(flow, w, L, isNewest, delay = 0) {
+      const card = document.createElement('div');
+      card.className = 'wish-card' + (isNewest ? ' newest entering' : '');
+      card.style.paddingLeft  = `${L.px}px`;
+      card.style.paddingRight = `${L.px}px`;
+      if (delay) card.style.animationDelay = `${delay}s`;
+
+      card.innerHTML = `
+        <div class="card-deco"
+             style="font-size:${L.deco}px; margin-bottom:${L.decoMb}px">✦</div>
+        <div class="card-msg"
+             style="font-size:${L.msg}px">${esc(w.message)}</div>
+        <div class="card-name"
+             style="font-size:${L.name}px; margin-top:${L.nameMt}px">
+          — ${esc(w.guestName)}
+        </div>`;
+
+      flow.appendChild(card);
+      
+      /* ปรับขนาดฟอนต์อัตโนมัติถ้าข้อความยาว */
+      requestAnimationFrame(() => {
+        const msgEl = card.querySelector('.card-msg');
+        shrinkFontIfNeeded(msgEl, L.msg);
+        setupReadMore(card, msgEl);
+      });
+    }
+
+    /* ── Setup read more ── */
+    function setupReadMore(card, msgEl) {
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) return;
+
+        if (card.querySelector('.read-more-btn')) return;
+      
+      // สำหรับหรือ expand/collapse
+      if (msgEl.scrollHeight > 150) {
+        msgEl.classList.add('collapsed');
+        
+        const readMoreBtn = document.createElement('button');
+        readMoreBtn.className = 'read-more-btn show';
+        readMoreBtn.textContent = 'อ่านเพิ่มเติม...';
+        
+        let isExpanded = false;
+        readMoreBtn.addEventListener('click', () => {
+          isExpanded = !isExpanded;
+          if (isExpanded) {
+            msgEl.classList.remove('collapsed');
+            readMoreBtn.textContent = 'ซ่อนข้อความ';
+          } else {
+            msgEl.classList.add('collapsed');
+            readMoreBtn.textContent = 'อ่านเพิ่มเติม...';
+          }
+        });
+        
+        msgEl.parentElement.insertBefore(readMoreBtn, msgEl.nextSibling);
+      }
+    }
+
+    /* ── ลดฟอนต์อัตโนมัติถ้าข้อความล้น ── */
+    function shrinkFontIfNeeded(el, initialSize) {
+      const maxHeight = el.parentElement.offsetHeight * 0.85; // 70% ของความสูง card
+      let fontSize = initialSize;
+      const minFontSize = 12;
+      
+      while (el.offsetHeight > maxHeight && fontSize > minFontSize) {
+        fontSize -= 1;
+        el.style.fontSize = `${fontSize}px`;
+      }
+    }
+
+    /* ══════════════════════════════
+       LOAD + SOCKET
+    ══════════════════════════════ */
+    async function load() {
+      try {
+        const r = await fetch(`${BACKEND_URL}/api/wishes`);
+        const j = await r.json();
+        if (j.success) {
+          wishes = [...j.data].reverse();
+          render(false);
+        }
+      } catch(e) { console.error(e); }
+    }
+
+    const socket = io(BACKEND_URL || undefined);
+    socket.on('newWish', w => { wishes.push(w); render(true); });
+
+    load();
+
+    /* ══════════════════════════════
+       UPDATE DATE TIME IN FOOTER
+    ══════════════════════════════ */
+    function updateDateTime() {
+      const dt = new Date();
+      const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+      const day = days[dt.getDay()];
+      const date = String(dt.getDate()).padStart(2, '0');
+      const month = String(dt.getMonth() + 1).padStart(2, '0');
+      const year = dt.getFullYear() + 543;
+      const time = dt.toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      
+      document.getElementById('date-time').textContent = 
+        `${day} ${date}/${month}/${year} • ${time}`;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    /* ── Resize listener สำหรับ update layout ── */
+    let resizeTimeout;
+
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+
+  resizeTimeout = setTimeout(() => {
+    render(false); // ✅ บังคับ render ใหม่
+  }, 150); // debounce กันกระตุก
+});
+
+    /* ── Initialize read more เมื่อ load ── */
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.wish-card');
+        cards.forEach(card => {
+          const msgEl = card.querySelector('.card-msg');
+          setupReadMore(card, msgEl);
+        });
+      }, 100);
+    });
+  </script>
+</body>
+</html>

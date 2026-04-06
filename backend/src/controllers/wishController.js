@@ -33,6 +33,10 @@ const createWish = async (req, res) => {
       message,
     });
 
+    
+const io = req.app.get("io");
+io.emit("newWish", newWish);
+
     return res.status(201).json({
       success: true,
       message: 'Wish submitted successfully',
@@ -64,6 +68,7 @@ const getWishes = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   createWish,
